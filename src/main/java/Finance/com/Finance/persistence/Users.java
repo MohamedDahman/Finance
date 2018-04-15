@@ -16,7 +16,7 @@ public class Users {
 
     private String hash ;
 
-    private long cash;
+    private double cash;
 
 
     public Users() {
@@ -46,11 +46,11 @@ public class Users {
         this.hash = hash;
     }
 
-    public long getCash() {
+    public double getCash() {
         return cash;
     }
 
-    public void setCash(long cash) {
+    public void setCash(double cash) {
         this.cash = cash;
     }
 

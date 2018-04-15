@@ -1,13 +1,17 @@
 package Finance.com.Finance.Controller;
 
+
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
+import org.w3c.dom.css.CSSValue;
 
 import java.io.*;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.List;
 
+@Component
 public class Lookup {
 
     private String shareName;
@@ -34,7 +38,7 @@ public class Lookup {
         return sharePrice;
     }
 
-    private static String readAll(Reader rd) throws IOException {
+    public static String readAll(Reader rd) throws IOException {
         StringBuilder sb = new StringBuilder();
         int cp;
         while ((cp = rd.read()) != -1) {
@@ -42,7 +46,16 @@ public class Lookup {
         }
         return sb.toString();
     }
-    public String getPrice() {
+
+    public String getprice1(String shareName){
+        String url = "https://www.alphavantage.co/query?apikey=NAJXWIA8D6VN6A3K&datatype=csv&function=TIME_SERIES_INTRADAY&interval=1min&symbol="+shareName;
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<CSSValue> forEntity = restTemplate.getForEntity(url, CSSValue.class);
+        System.out.println(forEntity.getBody().getCssText());
+        return "hi";
+    }
+    public String getPrice(String shareName) {
+        this.shareName = shareName;
         String url = "https://www.alphavantage.co/query?apikey=NAJXWIA8D6VN6A3K&datatype=csv&function=TIME_SERIES_INTRADAY&interval=1min&symbol="+shareName;
         InputStream is = null;
         String result="";
