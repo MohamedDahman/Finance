@@ -32,6 +32,9 @@ public class EndPoint {
     ShareRepository shareRepository;
 
     @Autowired
+    PortfolioRepository portfolioRepository;
+
+    @Autowired
     IndexContrller indexContrller;
 
     @Autowired
@@ -45,6 +48,7 @@ public class EndPoint {
 
     @GetMapping("/quote")
     String Page(Model model){
+
         if (loginService.checkIsanyOneLogin()){
             model.addAttribute("islogin","true");
             return "quote";
@@ -96,15 +100,32 @@ public class EndPoint {
 
     @GetMapping("/buy")
     String showbuyShare(Model model){
-        model.addAttribute("islogin","true");
-        return "buy";
+        if (loginService.checkIsanyOneLogin()){
+            model.addAttribute("islogin","true");
+            return "buy";
+        }
+        else
+        {
+            return "redirect:"+indexContrller.login(model);
+        }
+
     }
     @GetMapping("/sell")
     String showsellShare(Model model){
-        model.addAttribute("islogin","true");
-       // Set<String> collect = shareRepository.findAll().stream().map(e -> e.getName()).collect(Collectors.toSet());
-        //model.addAttribute("shares",collect );
-        return "sell";
+/*
+        Set<String> collect = shareRepository.findAll().stream().map(e -> e.getName()).collect(Collectors.toSet());
+        model.addAttribute("shares",collect );
+*/
+
+        if (loginService.checkIsanyOneLogin()){
+            model.addAttribute("islogin","true");
+            return "sell";
+        }
+        else
+        {
+            return "redirect:"+indexContrller.login(model);
+        }
+
     }
 
     @PostMapping("/buy")
@@ -116,7 +137,6 @@ public class EndPoint {
         Optional<Users> byId = userRepository.findById(user1.getId());
         if (byId.isPresent()){
             System.out.println(byId.get().getCash());
-
             double total = Double.parseDouble(price) * Integer.parseInt(shares);
 
             double cash = user1.getCash();
@@ -132,6 +152,30 @@ public class EndPoint {
             newshare.setSymbol(symbol);
             newshare.setUsers(byId.get());
             shareRepository.save(newshare);
+
+
+            Optional<Portfolio> first = portfolioRepository.findAll()
+                    .stream()
+                    .filter(e -> e.getUser().getId() == user1.getId())
+                    .filter(e -> e.getSymbol().toString().equalsIgnoreCase(symbol))
+                    .findFirst();
+            if (first.isPresent()){
+                Portfolio portfolio = first.get();
+                long currentquntity = portfolio.getQuntity();
+                currentquntity += Long.parseLong(shares);
+                portfolio.setQuntity(currentquntity);
+                portfolioRepository.save(portfolio);
+            }
+            else
+            {
+                Portfolio portfolio = new Portfolio();
+                portfolio.setName(symbol);
+                portfolio.setSymbol(symbol);
+                portfolio.setQuntity(Long.parseLong(shares));
+                portfolio.setUser(byId.get());
+                portfolioRepository.save(portfolio);
+            }
+
         }
         return "redirect:"+indexContrller.Page(model);
         //return "index";
@@ -163,6 +207,30 @@ public class EndPoint {
             newshare.setSymbol(symbol);
             newshare.setUsers(byId.get());
             shareRepository.save(newshare);
+
+
+            Optional<Portfolio> first = portfolioRepository.findAll()
+                    .stream()
+                    .filter(e -> e.getUser().getId() == user1.getId())
+                    .filter(e -> e.getSymbol().toString().equalsIgnoreCase(symbol))
+                    .findFirst();
+            if (first.isPresent()){
+                Portfolio portfolio = first.get();
+                long currentquntity = portfolio.getQuntity();
+                currentquntity -= Long.parseLong(quntity);
+                portfolio.setQuntity(currentquntity);
+                portfolioRepository.save(portfolio);
+            }
+            else
+            {
+                Portfolio portfolio = new Portfolio();
+                portfolio.setName(symbol);
+                portfolio.setSymbol(symbol);
+                portfolio.setQuntity(Long.parseLong(quntity));
+                portfolio.setUser(byId.get());
+                portfolioRepository.save(portfolio);
+            }
+
         }
 
         return "redirect:"+indexContrller.Page(model);

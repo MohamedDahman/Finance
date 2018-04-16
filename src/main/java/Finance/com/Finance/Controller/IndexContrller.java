@@ -1,7 +1,7 @@
 package Finance.com.Finance.Controller;
 
-import Finance.com.Finance.persistence.UserRepository;
-import Finance.com.Finance.persistence.Users;
+import Finance.com.Finance.persistence.*;
+import org.hibernate.validator.internal.util.logging.formatter.CollectionOfObjectsToStringFormatter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -10,7 +10,10 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 
 @Controller
@@ -25,12 +28,15 @@ public class IndexContrller {
     @Autowired
     private  UserRepository userRepository;
 
+    @Autowired
+    private ShareRepository shareRepository;
+
     /*public IndexContrller(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 */
-    @GetMapping("/index")
-    String Page(Model model){
+    @GetMapping("/")
+    String PageIndex(Model model){
         if (loginService.checkIsanyOneLogin() == true){
             model.addAttribute("islogin","true");
             return  "index";
@@ -40,18 +46,33 @@ public class IndexContrller {
             model.addAttribute("islogin","false");
             return  login(model);
         }
-/*
-        Object user_id = session.getAttribute("user");
-        if (user_id != null) {
+    }
+
+    @GetMapping("/index")
+    String Page(Model model){
+        if (loginService.checkIsanyOneLogin() == true){
+            Object user = session.getAttribute("user");
             model.addAttribute("islogin","true");
+            Map<Share, Long> collectBuying = shareRepository.findAll()
+                    .stream()
+                    .filter(e -> e.getUsers() == user)
+                    .filter(e -> e.getMoveType() == MoveType.buying)
+                    .collect(Collectors.groupingBy(e -> e, Collectors.counting()));
+
+            Map<Share, Long> collectSelling = shareRepository.findAll()
+                    .stream()
+                    .filter(e -> e.getUsers() == user)
+                    .filter(e -> e.getMoveType() == MoveType.selling)
+                    .collect(Collectors.groupingBy(e -> e, Collectors.counting()));
+
+
             return  "index";
         }
-        else{
+        else
+        {
             model.addAttribute("islogin","false");
             return  login(model);
         }
-*/
-
 
     }
 
