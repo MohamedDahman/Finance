@@ -12,6 +12,7 @@ import javax.validation.Valid;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
@@ -26,10 +27,16 @@ public class IndexContrller {
     LoginService loginService;
 
     @Autowired
-    private  UserRepository userRepository;
+    PortfolioRepository portfolioRepository;
 
     @Autowired
-    private ShareRepository shareRepository;
+    UserRepository userRepository;
+
+    @Autowired
+    ShareRepository shareRepository;
+
+    @Autowired
+    Lookup lookup;
 
     /*public IndexContrller(UserRepository userRepository) {
         this.userRepository = userRepository;
@@ -52,20 +59,23 @@ public class IndexContrller {
     String Page(Model model){
         if (loginService.checkIsanyOneLogin() == true){
             Object user = session.getAttribute("user");
+            Users user1 = (Users) user;
             model.addAttribute("islogin","true");
-            Map<Share, Long> collectBuying = shareRepository.findAll()
+            Set<Portfolio> portfolioSet = portfolioRepository.findAll()
                     .stream()
-                    .filter(e -> e.getUsers() == user)
-                    .filter(e -> e.getMoveType() == MoveType.buying)
-                    .collect(Collectors.groupingBy(e -> e, Collectors.counting()));
+                    .filter(e -> e.getUser().getId() == user1.getId())
+                    .collect(Collectors.toSet());
+            portfolioSet.stream().forEach(e->e.setPrice(Double.parseDouble(lookup.getPrice(e.getSymbol()))));
+            model.addAttribute("shares",portfolioSet);
+            model.addAttribute("cash",user1.getCash());
+            Optional<Double> reduce = portfolioSet.stream().map(e -> e.getPrice() * e.getQuntity()).reduce((e1, e2) -> e1 + e2);
+            if (reduce.isPresent()){
+                model.addAttribute("total",reduce.get()+user1.getCash());
+            }
+            else{
+                model.addAttribute("total",user1.getCash());
 
-            Map<Share, Long> collectSelling = shareRepository.findAll()
-                    .stream()
-                    .filter(e -> e.getUsers() == user)
-                    .filter(e -> e.getMoveType() == MoveType.selling)
-                    .collect(Collectors.groupingBy(e -> e, Collectors.counting()));
-
-
+            }
             return  "index";
         }
         else

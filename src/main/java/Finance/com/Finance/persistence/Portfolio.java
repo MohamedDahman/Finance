@@ -18,6 +18,8 @@ public class Portfolio {
 
     private long quntity;
 
+    private double price;
+
     @ManyToOne
     private Users user;
 
@@ -72,5 +74,13 @@ public class Portfolio {
 
     public void setUser(Users user) {
         this.user = user;
+    }
+
+    public double getPrice() {
+        return price;
+    }
+
+    public void setPrice(double price) {
+        this.price = price;
     }
 }

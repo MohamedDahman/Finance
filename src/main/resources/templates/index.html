@@ -50,26 +50,26 @@
         <th>Price</th>
         <th>TOTAL</th>
       </tr>
-      <tr th:each="shares : ${shares}">
-        <td th:text="">{{ stock.symbol }}</td>
-        <td>{{ stock.name }}</td>
-        <td>{{ stock.shares }}</td>
-        <td>{{ stock.price }}</td>
-        <td>{{ stock.total }}</td>
+      <tr th:each="share : ${shares}">
+        <td th:text="${share.symbol}"></td>
+        <td th:text="${share.symbol}"></td>
+        <td th:text="${share.quntity}"></td>
+        <td th:text="${share.price}"></td>
+        <td th:text="${share.price * share.quntity}">{{ stock.total }}</td>
       </tr>
       <tr>
         <td>CASH</td>
         <td></td>
         <td></td>
         <td></td>
-        <td>{{ cash }}</td>
+        <td th:text="${cash}">{{ cash }}</td>
       </tr>
       <tr>
         <td>TOTAL</td>
         <td></td>
         <td></td>
         <td></td>
-        <td><b>{{ total }}</b></td>
+        <td th:text="${total}"><b></b></td>
       </tr>
     </table>
 
