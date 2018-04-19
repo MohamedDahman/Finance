@@ -1,8 +1,21 @@
+/**************************************************
+ * Finance
+ *
+ *
+ * code written by: Mohamed Dahman
+ *
+ * This program for buy and sell shares .
+ *
+ ***************************************************/
+
+
 package Finance.com.Finance.Controller;
 
 
 import Finance.com.Finance.persistence.*;
+import org.aspectj.lang.annotation.Before;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -46,9 +59,24 @@ public class EndPoint {
     @Autowired
     Lookup lookup;
 
+  /*
+    @Before("/quote")
+    String dosomething(Model model){
+        if (loginService.checkIsanyOneLogin()){
+            return "redirect:"+indexContrller.login(model);
+        }
+        else
+        {
+            return " err";
+        }
+
+    }
+*/
+
+
+
     @GetMapping("/quote")
     String Page(Model model){
-
         if (loginService.checkIsanyOneLogin()){
             model.addAttribute("islogin","true");
             return "quote";

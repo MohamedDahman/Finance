@@ -1,6 +1,14 @@
-package Finance.com.Finance.persistence;
+/**************************************************
+ * Finance
+ *
+ *
+ * code written by: Mohamed Dahman
+ *
+ * This program for buy and sell shares .
+ *
+ ***************************************************/
 
-import org.springframework.stereotype.Component;
+package Finance.com.Finance.persistence;
 
 import javax.persistence.*;
 
